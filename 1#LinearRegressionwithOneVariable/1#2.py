@@ -2,7 +2,7 @@ import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
 
-# (1/6)人]工数据集生成
+# (1/6)人工数据集生成
 np.random.seed(5)  # 设置随机数种子
 x_data = np.linspace(-1, 1, 100)  # 等差数列,-1~1之间,100个
 
@@ -59,14 +59,23 @@ init = tf.global_variables_initializer()
 sess.run(init)
 
 # (5/6)迭代训练
+# 训练中显示损失值
+step = 0
+loss_list = []
+display_step = 10
 for epoch in range(train_epochs):
     for xs, ys in zip(x_data, y_data):
         _, loss = sess.run([optimizer, loss_function],
                            feed_dict={x: xs, y: ys})
-
+        loss_list.append(loss)
+        step = step + 1
+        if step % display_step == 0:
+            print("Train Epoch:", '%02d' % (epoch+1), "Step %03d" %
+                  (step), "loss=", "{:.9f}".format(loss))
     b0temp = b.eval(session=sess)
-    w0temp = w.eval(session=sess)
-  # plt.plot(x_data, w0temp*x_data+b0temp)
+    w0temp = b.eval(session=sess)
+#   plt.plot(x_data, w0temp*x_data+b0temp)
+
 
 print("w:", sess.run(w))
 print("b:", sess.run(b))
@@ -75,8 +84,8 @@ print("b:", sess.run(b))
 # plt.plot(x_data, x_data*sess.run(w)+sess.run(b),
 #         label="Fitted line", color="r", linewidth=3)
 # plt.legend(loc=2)  # 指定图列位置
-
-# plt.show()
+plt.plot(loss_list)
+plt.show()
 
 # (6/6)模型预测
 x_test = 3.21
